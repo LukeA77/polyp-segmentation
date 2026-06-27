@@ -19,17 +19,19 @@ env/
 .ruff_cache/
 .mypy_cache/
 
-# Project outputs (real artifacts live on Drive, not git)
-outputs/
-wandb/
+# Project outputs (real artifacts live on Drive, not git). Anchored to repo root
+# (leading /) — an unanchored `data/` previously matched src/data/ too and silently
+# dropped that whole subpackage from every commit.
+/outputs/
+/wandb/
 *.ckpt
 *.pt
 *.pth
 *.onnx
 
 # Local data (kept off git; lives on Drive per configs/*.yaml paths)
-data/
-datasets/
+/data/
+/datasets/
 
 # Local-only config overrides used during Colab-local-runtime development.
 # Not part of the spec's config set — safe to delete once on GitHub+Drive.
