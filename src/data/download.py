@@ -87,9 +87,7 @@ def verify_integrity(data_root: Path) -> tuple[int, int, int]:
         )
 
     n_unreadable = sum(
-        1
-        for path in (*image_files.values(), *mask_files.values())
-        if cv2.imread(str(path)) is None
+        1 for path in (*image_files.values(), *mask_files.values()) if cv2.imread(str(path)) is None
     )
     if n_unreadable:
         raise DatasetVerificationError(f"{n_unreadable} file(s) failed to read.")
@@ -100,21 +98,23 @@ def verify_integrity(data_root: Path) -> tuple[int, int, int]:
 def _download_via_kaggle(data_root: Path) -> Path | None:
     """Download+extract via the Kaggle API. Returns the extraction root, or None to
     signal the caller should fall back to the Simula zip.
-    """
-    try:
-        from kaggle.api.kaggle_api_extended import KaggleApi
-    except ImportError:
-        logger.info("kaggle package not installed; falling back to Simula.")
-        return None
 
+    The `kaggle` package calls `sys.exit()` (raising `SystemExit`, not a regular
+    exception) when credentials are missing or invalid -- sometimes at import time,
+    before we even get to call anything. `SystemExit` isn't an `Exception` subclass,
+    so it must be caught explicitly here or it kills the whole script instead of
+    falling back to Simula.
+    """
     tmp_dir = data_root / "_kaggle_download"
     try:
+        from kaggle.api.kaggle_api_extended import KaggleApi
+
         api = KaggleApi()
         api.authenticate()
         tmp_dir.mkdir(parents=True, exist_ok=True)
         api.dataset_download_files(_KAGGLE_DATASET, path=str(tmp_dir), unzip=True, quiet=False)
         return tmp_dir
-    except Exception as exc:  # kaggle raises ad hoc exceptions for missing/invalid creds
+    except (ImportError, SystemExit, Exception) as exc:
         logger.info("Kaggle API unavailable (%s); falling back to Simula.", exc)
         shutil.rmtree(tmp_dir, ignore_errors=True)
         return None
