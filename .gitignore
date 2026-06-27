@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Environments
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Project outputs (real artifacts live on Drive, not git)
+outputs/
+wandb/
+*.ckpt
+*.pt
+*.pth
+*.onnx
+
+# Local data (kept off git; lives on Drive per configs/*.yaml paths)
+data/
+datasets/
+
+# Local-only config overrides used during Colab-local-runtime development.
+# Not part of the spec's config set — safe to delete once on GitHub+Drive.
+configs/local.yaml
+configs/local_smoke.yaml
+configs/splits_smoke.json
+
+# OS / editor
+.DS_Store
+*.log

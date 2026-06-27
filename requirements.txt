@@ -1,0 +1,38 @@
+# Core
+torch>=2.2
+torchvision>=0.17
+segmentation-models-pytorch>=0.3.3
+albumentations>=1.4
+opencv-python-headless>=4.9
+numpy>=1.26
+pyyaml>=6.0
+
+# Metrics / calibration
+scikit-learn>=1.4
+scikit-image>=0.22
+scipy>=1.11
+
+# Viz
+matplotlib>=3.8
+
+# Explainability
+grad-cam>=1.5
+
+# Export / deployment
+onnx>=1.15
+onnxruntime>=1.17
+onnxscript>=0.1  # required by torch.onnx.export's default dynamo-based exporter (torch>=2.5)
+
+# Experiment tracking (offline fallback if no API key)
+wandb>=0.16
+
+# Data download
+kaggle>=1.6
+requests>=2.31
+truststore>=0.9
+
+# Tooling
+tqdm>=4.66
+pytest>=8.0
+ruff>=0.4
+black>=24.0

@@ -1,0 +1,65 @@
+project: polyp-segmentation
+seed: 42
+
+paths:
+  data_root: /content/drive/MyDrive/datasets/kvasir-seg
+  output_root: /content/drive/MyDrive/polyp-seg-outputs
+  split_manifest: configs/splits.json      # committed to git for reproducibility
+
+data:
+  image_size: 352          # PraNet-era standard for polyp seg
+  val_fraction: 0.10
+  test_fraction: 0.10
+  num_workers: 2
+  pin_memory: true
+  normalize: imagenet      # mean/std for the pretrained encoder
+
+augment:                   # albumentations, train only
+  hflip: 0.5
+  vflip: 0.5
+  rotate90: 0.5
+  brightness_contrast: 0.2
+  elastic: 0.2             # endoscopy frames deform well under elastic/grid distort
+  grid_distortion: 0.2
+  coarse_dropout: 0.2
+
+model:
+  arch: unet               # unet | deeplabv3plus | (segformer = optional later)
+  encoder: resnet34        # timm/smp encoder name
+  encoder_weights: imagenet
+  in_channels: 3
+  classes: 1               # binary -> single logit channel
+
+loss:
+  name: dice_bce
+  dice_weight: 0.5
+  bce_weight: 0.5
+
+train:
+  epochs: 80
+  batch_size: 16
+  optimizer: adamw
+  lr: 3.0e-4
+  weight_decay: 1.0e-4
+  scheduler: cosine        # cosine | plateau
+  amp: true                # mixed precision
+  early_stop_patience: 15  # on val Dice
+  monitor: val_dice
+
+eval:
+  threshold: auto          # 'auto' = sweep on val; or a float
+  tta: false               # flip-TTA toggle
+  boundary_metrics: true   # HD95 / boundary IoU
+  calibration: true        # ECE + reliability diagram
+
+export:
+  opset: 18  # torch's dynamo-based exporter (torch>=2.5) emits opset 18 Resize ops for
+             # this model with no downgrade adapter to 17; configuring 18 avoids a noisy
+             # failed version-conversion attempt that otherwise falls back to 18 anyway
+  dynamic_batch: true
+  parity_atol: 1.0e-4
+  benchmark_runs: 50
+
+logging:
+  backend: wandb           # wandb | none ; falls back to offline if no key
+  project: polyp-segmentation

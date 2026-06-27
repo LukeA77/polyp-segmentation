@@ -1,0 +1,19 @@
+# Overrides for the Stage-4 smoke run. Deep-merged onto configs/default.yaml by
+# src.utils.config.load_config — only the keys that need to differ are listed here.
+
+paths:
+  split_manifest: configs/splits_smoke.json  # separate from the real, committed splits.json
+
+data:
+  subset: 16            # truncate to 16 images before splitting (8 train / 4 val / 4 test)
+  val_fraction: 0.25
+  test_fraction: 0.25
+  image_size: 128        # smaller than the real 352 to keep the smoke run fast
+  num_workers: 0          # avoid multiprocessing-worker overhead/flakiness for 16 images
+
+train:
+  epochs: 2
+  batch_size: 4
+
+logging:
+  backend: none
